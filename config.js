@@ -81,10 +81,10 @@ const wedding = {
 
   // ⑧ OG / 카카오 공유 — 배포 URL 확정 후 교체
   og: {
-    title: '추연성 💍 양규은 결혼합니다.',
-    description: '2026년 11월 21일 토요일 오후 6시',
-    imageUrl: 'https://your-domain.com/og.jpg',
-    pageUrl: 'https://your-domain.com',
-    kakaoAppKey: 'YOUR_KAKAO_JAVASCRIPT_KEY',
+  title: '추연성 💍 양규은 결혼합니다.',
+  description: '2026년 11월 21일 토요일 오후 6시',
+  imageUrl: 'https://rbdms213.github.io/cy-yk-20261121-wedding-private/gallery/1.jpg',
+  pageUrl: 'https://rbdms213.github.io/cy-yk-20261121-wedding-private/',
+  kakaoAppKey: '0ba03cc8903c5643a252fc137701ef85',
   },
 };
