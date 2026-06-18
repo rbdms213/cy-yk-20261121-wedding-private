@@ -76,7 +76,10 @@ const wedding = {
   accounts: [
     { side: 'groom', bank: '국민은행',   holder: '추연성', number: '123-456-789012' },
     { side: 'groom', bank: '신한은행',   holder: '추광석', number: '987-654-321098' },
+    { side: 'groom', bank: '신한은행',   holder: '강차임', number: '987-654-321098' },
     { side: 'bride', bank: '카카오뱅크', holder: '양규은', number: '333-44-5555555' },
+    { side: 'bride', bank: '카카오뱅크', holder: '양경식', number: '333-44-5555555' },
+    { side: 'bride', bank: '카카오뱅크', holder: '방경순', number: '333-44-5555555' },
   ],
 
   // ⑧ OG / 카카오 공유 — 배포 URL 확정 후 교체
