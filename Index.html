@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>모바일 청첩장</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #111111;
+      --gray-1:  #333333;
+      --gray-2:  #666666;
+      --gray-3:  #999999;
+      --gray-4:  #cccccc;
+      --gray-5:  #efefef;
+      --white:   #ffffff;
+      --bg:      #fafafa;
+      --accent:  #111111;
+      --sans: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      width: 100%;
+      background: var(--white);
+      font-family: var(--sans);
+      color: var(--black);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── 01. 메인 비디오 ── */
+    #main-video {
+      position: relative;
+      width: 100vw;
+      height: 480px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #main-video video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    #btn-mute {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.4);
+      background: rgba(0,0,0,0.35);
+      color: rgba(255,255,255,0.85);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 300;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: background 0.2s, transform 0.15s;
+      z-index: 10;
+    }
+    #btn-mute:active { transform: scale(0.94); }
+
+    /* ── 01-B. 히어로 텍스트 ── */
+    #hero-text {
+      background: var(--white);
+      padding: 55px 32px 20px;
+      text-align: center;
+    }
+
+    #hero-text .hero-inner {
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #hero-text .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 300;
+      color: var(--gray-3);
+      margin-bottom: 14px;
+    }
+
+    #hero-text .hero-names {
+      font-family: var(--sans);
+      font-size: clamp(28px, 7vw, 40px);
+      font-weight: 600;
+      color: var(--black);
+      line-height: 1;
+      margin-bottom: 16px;
+      white-space: nowrap;
+    }
+
+    #hero-text .hero-dot {
+      font-weight: 200;
+      color: var(--gray-3);
+    }
+
+    #hero-text .hero-date {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--gray-2);
+      margin-bottom: 6px;
+    }
+
+    #hero-text .hero-venue {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-3);
+    }
+
+    /* ── 공통 ── */
+    .section-inner {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.75s ease, transform 0.75s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── 02. 초대문구 ── */
+    #invite-section {
+      background: var(--white);
+      padding: 30px 0;
+    }
+
+    #invite-section .invite-lines {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .fade-line {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-line.visible { opacity: 1; transform: translateY(0); }
+
+    #invite-section .invite-p {
+      font-family: var(--sans);
+      line-height: 1.75;
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--gray-1);
+      text-align: center;
+      margin: 0;
+    }
+
+    #invite-section .invite-spacer { height: 20px; }
+
+    /* ── 03. 혼주 + 신랑·신부 ── */
+    #family-section {
+      /*background: var(--bg);*/
+      padding: 30px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #family-section .family-eyebrow {
+      display: none;
+    }
+
+    #family-section .family-row {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      width: 100%;
+      max-width: 400px;
+      padding: 0 32px;
+    }
+
+    #family-section .family-divider {
+      width: 1px;
+      background: var(--gray-5);
+      flex-shrink: 0;
+      margin: 4px 0;
+    }
+
+    #family-section .family-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    #family-section .family-col.visible { opacity: 1; transform: translateY(0); }
+    #family-section .family-col.col-groom { transition-delay: 0s; }
+    #family-section .family-col.col-bride { transition-delay: 0.12s; }
+
+    #family-section .family-parents {
+      font-size: 11px;
+      font-weight: 300;
+      line-height: 1.9;
+      color: var(--gray-3);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    #family-section .family-name {
+      font-family: var(--sans);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--black);
+      line-height: 1;
+    }
+
+    #family-section .family-tel {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-4);
+      background: var(--white);
+      color: var(--gray-2);
+      font-size: 13px;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+    #family-section .family-tel:hover {
+      background: var(--black);
+      border-color: var(--black);
+      color: var(--white);
+    }
+    #family-section .family-tel:active { transform: scale(0.9); }
+
+    /* ── 04. 날짜·장소 ── */
+    #date-section {
+      background: var(--white);
+      padding: 72px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #date-section .date-eyebrow {
+      font-size: 9px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    #date-section .date-eyebrow.visible { opacity: 1; transform: translateY(0); }
+
+    #date-section .date-full {
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--gray-1);
+      text-align: center;
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s;
+    }
+    #date-section .date-full.visible { opacity: 1; transform: translateY(0); }
+
+    #date-section .mini-cal {
+      width: 100%;
+      max-width: 280px;
+      background: var(--bg);
+      border-radius: 4px;
+      border: 1px solid var(--gray-5);
+      padding: 16px 12px 14px;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s;
+    }
+    #date-section .mini-cal.visible { opacity: 1; transform: translateY(0); }
+
+    #date-section .cal-month-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--black);
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+    }
+
+    #date-section .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    #date-section .cal-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--gray-1);
+      border-radius: 50%;
+    }
+    #date-section .cal-cell.header {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--gray-3);
+    }
+    #date-section .cal-cell.header.sun { color: #c0736a; }
+    #date-section .cal-cell.header.sat { color: #6a82c0; }
+    #date-section .cal-cell.day-sun { color: #c0736a; }
+    #date-section .cal-cell.day-sat { color: #6a82c0; }
+    #date-section .cal-cell.wedding-day {
+      background: var(--black);
+      color: var(--white) !important;
+      font-weight: 600;
+    }
+
+    /* ── 카운트다운: 박스 제거, 텍스트 형식 ── */
+    #date-section .countdown-wrap {
+      width: 100%;
+      max-width: 320px;
+      background: transparent;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 36px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.3s, transform 0.7s ease 0.3s;
+    }
+    #date-section .countdown-wrap.visible { opacity: 1; transform: translateY(0); }
+
+    #date-section .countdown-text {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--gray-1);
+      text-align: center;
+      line-height: 1.8;
+    }
+    #date-section .countdown-text .cd-num {
+      color: #e05555;
+      font-weight: 600;
+    }
+
+    #date-section .venue-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.4s, transform 0.7s ease 0.4s;
+    }
+    #date-section .venue-wrap.visible { opacity: 1; transform: translateY(0); }
+
+    #date-section .venue-name {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--black);
+      text-align: center;
+    }
+    #date-section .venue-hall {
+      font-size: 20px;
+      font-weight: 300;
+      color: var(--gray-3);
+      text-align: center;
+    }
+
+    /* ── 05. 갤러리 ── */
+    #gallery-section {
+      background: var(--bg);
+      padding: 72px 0 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #gallery-section .gallery-eyebrow {
+      font-size: 9px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      margin-bottom: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    #gallery-section .gallery-eyebrow.visible { opacity: 1; transform: translateY(0); }
+
+    #gallery-section .gallery-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    #gallery-section .g-item {
+      aspect-ratio: 1;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--gray-5);
+    }
+
+    #gallery-section .g-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    #gallery-section .g-item:hover img { transform: scale(1.04); }
+    #gallery-section .g-item.hidden-item { display: none; }
+
+    #gallery-section .gallery-more-btn {
+      margin-top: 24px;
+      padding: 11px 36px;
+      border: 1px solid var(--black);
+      background: transparent;
+      color: var(--black);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      border-radius: 0;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    #gallery-section .gallery-more-btn:hover { background: var(--black); color: var(--white); }
+    #gallery-section .gallery-more-btn.hidden { display: none; }
+
+    /* ── 모달 ── */
+    #gallery-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.96);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #gallery-modal.open { display: flex; }
+
+    #gallery-modal .modal-img-wrap {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #gallery-modal .modal-img {
+      max-width: 94vw;
+      max-height: 84vh;
+      object-fit: contain;
+      transition: opacity 0.2s ease;
+    }
+    #gallery-modal .modal-img.fading { opacity: 0; }
+
+    #gallery-modal .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, border-color 0.2s;
+      z-index: 10;
+    }
+    #gallery-modal .modal-close:hover { color: #fff; border-color: rgba(255,255,255,0.6); }
+
+    #gallery-modal .modal-prev,
+    #gallery-modal .modal-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, border-color 0.2s;
+      z-index: 10;
+    }
+    #gallery-modal .modal-prev { left: 16px; }
+    #gallery-modal .modal-next { right: 16px; }
+    #gallery-modal .modal-prev:hover,
+    #gallery-modal .modal-next:hover { color: #fff; border-color: rgba(255,255,255,0.6); }
+    #gallery-modal .modal-prev:active,
+    #gallery-modal .modal-next:active { transform: translateY(-50%) scale(0.93); }
+
+    #gallery-modal .modal-counter {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.2em;
+      white-space: nowrap;
+    }
+
+    .placeholder-section {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--gray-3);
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      border-top: 1px solid var(--gray-5);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== 01. 메인 비디오 섹션 ===== -->
+<section id="main-video" aria-label="메인 인트로 영상">
+  <video
+    id="wedding-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    aria-hidden="true"
+  >
+    <!-- src 는 config.js 에서 주입됨 -->
+  </video>
+  <button id="btn-mute" aria-label="음소거 해제">🔇</button>
+</section>
+
+<!-- ===== 01-B. 히어로 텍스트 (영상 아래) ===== -->
+<div id="hero-text" aria-label="신랑신부 이름 및 날짜">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">💍 WEDDING INVITATION</p>
+    <h1 class="hero-names">
+      <span id="groom-name">신랑</span>
+      <span class="hero-dot">·</span>
+      <span id="bride-name">신부</span>
+    </h1>
+    <p class="hero-date" id="wedding-date-label"></p>
+    <p class="hero-venue" id="hero-venue-label"></p>
+  </div>
+</div>
+
+<!-- ===== 02. 초대문구 섹션 ===== -->
+<section id="invite-section" aria-label="초대문구">
+  <div class="section-inner">
+    <div class="invite-lines" id="invite-lines"></div>
+  </div>
+</section>
+
+<!-- ===== 03. 혼주 성함 + 신랑·신부 섹션 ===== -->
+<section id="family-section" aria-label="혼주 성함 및 신랑신부 소개">
+  <div class="family-row">
+    <div class="family-col col-groom" id="col-groom">
+      <p class="family-parents" id="groom-parents"></p>
+      <p class="family-name"   id="family-groom-name"></p>
+      <a class="family-tel"    id="groom-tel" href="#" aria-label="신랑에게 전화">📞</a>
+    </div>
+    <div class="family-divider" aria-hidden="true"></div>
+    <div class="family-col col-bride" id="col-bride">
+      <p class="family-parents" id="bride-parents"></p>
+      <p class="family-name"   id="family-bride-name"></p>
+      <a class="family-tel"    id="bride-tel" href="#" aria-label="신부에게 전화">📞</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 04. 날짜·장소 섹션 ===== -->
+<section id="date-section" aria-label="결혼식 날짜 및 장소">
+  <div class="mini-cal" id="mini-cal" aria-label="결혼식 달력">
+    <p class="cal-month-label" id="cal-month-label"></p>
+    <div class="cal-grid" id="cal-grid" role="grid"></div>
+  </div>
+
+  <!-- 카운트다운: 박스 없이 텍스트 형식 -->
+  <div class="countdown-wrap" id="countdown-wrap" aria-live="polite" aria-atomic="true">
+    <p class="countdown-text">
+      <span id="cd-groom-name"></span> 💛 <span id="cd-bride-name"></span>의 결혼식이
+      <span class="cd-num" id="cd-days">···</span>일 남았습니다.
+    </p>
+  </div>
+</section>
+
+<!-- ===== 05. 갤러리 섹션 ===== -->
+<section id="gallery-section" aria-label="웨딩 갤러리">
+  <p class="gallery-eyebrow" id="gallery-eyebrow">Gallery</p>
+  <div class="gallery-grid" id="gallery-grid" role="list"></div>
+  <button class="gallery-more-btn hidden" id="gallery-more-btn" aria-label="갤러리 더보기">
+    + 더보기
+  </button>
+</section>
+
+<!-- ===== 갤러리 모달 ===== -->
+<div id="gallery-modal" role="dialog" aria-modal="true" aria-label="사진 크게 보기">
+  <button class="modal-close" id="modal-close" aria-label="닫기">✕</button>
+  <div class="modal-img-wrap" id="modal-img-wrap">
+    <img class="modal-img" id="modal-img" src="" alt="웨딩 사진" />
+  </div>
+  <button class="modal-prev" id="modal-prev" aria-label="이전 사진">&#8249;</button>
+  <button class="modal-next" id="modal-next" aria-label="다음 사진">&#8250;</button>
+  <p class="modal-counter" id="modal-counter"></p>
+</div>
+
+<!-- 이후 섹션들 (개발 예정) -->
+<section class="placeholder-section">06 · 지도 / 길찾기 — 준비 중</section>
+
+
+<!-- ===== config.js ===== -->
+<script>
+const wedding = {
+  // ① 메인 영상
+  video: { url: './video/SANY0283.MP4' },
+
+  // ② 신랑·신부 정보
+  groom: {
+    name: '추연성',
+    phone: '010-5556-8485',
+    father: '추광석',
+    mother: '강차임',
+  },
+  bride: {
+    name: '양규은',
+    phone: '010-5029-8599',
+    father: '양경식',
+    mother: '방경순',
+  },
+
+  // ③ 초대문구
+  inviteText: [
+    '2020년 11월 21일,',
+    '평생을 다르게 살아온 우리가 만나',
+    '2026년 11월 21일,',
+    '앞으로의 영원을 함께 할 것을 약속하려 합니다.',
+    '',
+    '여섯번의 사계절을 넘어',
+    '앞으로 함께 나아갈 수많은 계절,',
+    '그 시작을 약속할 자리에',
+    '소중한 걸음으로 함께해 주시면 감사하겠습니다.',
+  ],
+
+  // ④ 날짜·장소
+  date: '2026-11-21T18:00:00',
+  venue: {
+    name: '인천 아시아드웨딩컨벤션',
+    hall: '비아벨라홀',
+    address: '인천광역시 서구 봉수대로 806',
+    lat: 37.5387,
+    lng: 126.6728,
+    transport: {
+      subway: '인천 1호선 검암역 1번 출구 도보 10분',
+      bus: '아시아드웨딩컨벤션 정류장 하차',
+      parking: '전용 주차장 무료 이용',
+    },
+  },
+
+  // ⑤ 갤러리
+  gallery: [
+    './gallery/1.jpg',
+    './gallery/2.jpg',
+    './gallery/3.jpg',
+    './gallery/4.jpg',
+    './gallery/5.jpg',
+    './gallery/6.jpg',
+    './gallery/7.jpg',
+    './gallery/8.jpg',
+    './gallery/9.jpg',
+    './gallery/10.jpg',
+    './gallery/11.jpg',
+    './gallery/12.jpg',
+    './gallery/13.jpg',
+    './gallery/14.jpg',
+    './gallery/15.jpg',
+    './gallery/16.jpg',
+    './gallery/17.jpg',
+    './gallery/18.jpg',
+    './gallery/19.jpg',
+    './gallery/20.jpg',
+    './gallery/21.jpg',
+    './gallery/22.jpg',
+    './gallery/23.jpg',
+  ],
+
+  // ⑦ 계좌
+  accounts: [
+    { side: 'groom', bank: '국민은행',   holder: '추연성',  number: '123-456-789012' },
+    { side: 'groom', bank: '신한은행',   holder: '추광석',  number: '987-654-321098' },
+    { side: 'bride', bank: '카카오뱅크', holder: '양규은',  number: '333-44-5555555' },
+  ],
+
+  // ⑧ OG / 카카오 공유
+  og: {
+    title: '추연성 💍 양규은 결혼합니다.',
+    description: '2026년 11월 21일 토요일 오후 6시',
+    imageUrl: 'https://your-domain.com/og.jpg',
+    pageUrl: 'https://your-domain.com',
+    kakaoAppKey: 'YOUR_KAKAO_JAVASCRIPT_KEY',
+  },
+};
+</script>
+
+<!-- ===== main.js ===== -->
+<script>
+(function () {
+
+  /* ── 비디오 src 주입 ── */
+  const videoEl = document.getElementById('wedding-video');
+  if (wedding.video && wedding.video.url) {
+    const src = document.createElement('source');
+    src.src = wedding.video.url;
+    src.type = 'video/mp4';
+    videoEl.appendChild(src);
+    videoEl.load();
+  }
+
+  /* ── 이름 바인딩 ── */
+  const groomEl = document.getElementById('groom-name');
+  const brideEl = document.getElementById('bride-name');
+  if (groomEl && wedding.groom) groomEl.textContent = wedding.groom.name;
+  if (brideEl && wedding.bride) brideEl.textContent = wedding.bride.name;
+
+  /* ── 날짜 레이블 (히어로) ── */
+  const dateLabel = document.getElementById('wedding-date-label');
+  if (dateLabel && wedding.date) {
+    const d = new Date(wedding.date);
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const h = d.getHours();
+    const ampm = h < 12 ? '오전' : '오후';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    dateLabel.textContent =
+      `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${days[d.getDay()]}요일  ${ampm} ${h12}시`;
+  }
+
+  /* ── 장소 레이블 (히어로) ── */
+  const heroVenue = document.getElementById('hero-venue-label');
+  if (heroVenue && wedding.venue) {
+    heroVenue.textContent = `${wedding.venue.name}  ${wedding.venue.hall}`;
+  }
+
+  /* ── 음소거 토글 ── */
+  const muteBtn = document.getElementById('btn-mute');
+  let isMuted = true;
+
+  function updateMuteBtn() {
+    muteBtn.innerHTML = isMuted
+      ? '<span>🔇</span><span>음소거 해제</span>'
+      : '<span>🔊</span><span>음소거</span>';
+    muteBtn.setAttribute('aria-label', isMuted ? '음소거 해제' : '음소거');
+  }
+  updateMuteBtn();
+
+  muteBtn.addEventListener('click', () => {
+    isMuted = !isMuted;
+    videoEl.muted = isMuted;
+    updateMuteBtn();
+  });
+
+  /* ── 스크롤 시 음소거 버튼 투명하게 ── */
+  window.addEventListener('scroll', () => {
+    muteBtn.style.opacity = window.scrollY > 80 ? '0.4' : '1';
+  }, { passive: true });
+
+  /* ── 02. 초대문구 렌더링 ── */
+  const inviteContainer = document.getElementById('invite-lines');
+  if (inviteContainer && Array.isArray(wedding.inviteText)) {
+    wedding.inviteText.forEach((line, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'fade-line';
+      wrap.style.transitionDelay = `${i * 0.07}s`;
+
+      if (line === '') {
+        const spacer = document.createElement('div');
+        spacer.className = 'invite-spacer';
+        wrap.appendChild(spacer);
+      } else {
+        const p = document.createElement('p');
+        p.className = 'invite-p';
+        p.textContent = line;
+        wrap.appendChild(p);
+      }
+
+      inviteContainer.appendChild(wrap);
+    });
+  }
+
+  /* ── IntersectionObserver ── */
+  const fadeTargets = document.querySelectorAll('.fade-line');
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+  );
+  fadeTargets.forEach(el => observer.observe(el));
+
+  /* ── 03. 혼주 + 신랑·신부 데이터 바인딩 ── */
+  function bindFamily(side, data) {
+    if (!data) return;
+    const role = side === 'groom' ? '아들' : '딸';
+    const parentsEl = document.getElementById(`${side}-parents`);
+    if (parentsEl) {
+      parentsEl.innerHTML = `${data.father}&thinsp;·&thinsp;${data.mother}의<br>${role}`;
+    }
+    const nameEl = document.getElementById(`family-${side}-name`);
+    if (nameEl) nameEl.textContent = data.name;
+    const telEl = document.getElementById(`${side}-tel`);
+    if (telEl && data.phone) {
+      telEl.href = `tel:${data.phone.replace(/-/g, '')}`;
+      telEl.setAttribute('aria-label', `${data.name}에게 전화`);
+    }
+  }
+
+  bindFamily('groom', wedding.groom);
+  bindFamily('bride', wedding.bride);
+  document.querySelectorAll('.family-col').forEach(el => observer.observe(el));
+
+  /* ── 04. 날짜·장소 섹션 ── */
+  (function initDateSection() {
+    if (!wedding.date) return;
+
+    const wDate  = new Date(wedding.date);
+    const DAY_KO = ['일','월','화','수','목','금','토'];
+    const h      = wDate.getHours();
+    const ampm   = h < 12 ? '오전' : '오후';
+    const h12    = h === 0 ? 12 : h > 12 ? h - 12 : h;
+
+    const fullEl = document.getElementById('date-full');
+    if (fullEl) {
+      fullEl.innerHTML =
+        `${wDate.getFullYear()}년 ${wDate.getMonth() + 1}월 ${wDate.getDate()}일`
+        + `<br>${DAY_KO[wDate.getDay()]}요일&emsp;${ampm} ${h12}시`;
+    }
+
+    const monthLabel = document.getElementById('cal-month-label');
+    const grid       = document.getElementById('cal-grid');
+    if (monthLabel && grid) {
+      const Y = wDate.getFullYear();
+      const M = wDate.getMonth();
+      const wDay = wDate.getDate();
+      monthLabel.textContent = `${Y}년 ${M + 1}월`;
+
+      ['일','월','화','수','목','금','토'].forEach((d, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell header' + (i === 0 ? ' sun' : i === 6 ? ' sat' : '');
+        cell.textContent = d;
+        grid.appendChild(cell);
+      });
+
+      const firstDay = new Date(Y, M, 1).getDay();
+      const daysInMonth = new Date(Y, M + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-cell';
+        grid.appendChild(empty);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dow  = (firstDay + d - 1) % 7;
+        const cell = document.createElement('div');
+        let cls = 'cal-cell';
+        if (dow === 0) cls += ' day-sun';
+        if (dow === 6) cls += ' day-sat';
+        if (d === wDay) cls += ' wedding-day';
+        cell.className   = cls;
+        cell.textContent = d;
+        if (d === wDay) cell.setAttribute('aria-label', `결혼식 날짜 ${d}일`);
+        grid.appendChild(cell);
+      }
+    }
+
+    /* ── 카운트다운: config에서 이름 동적 바인딩 + 일수 표시 ── */
+    const cdGroomEl = document.getElementById('cd-groom-name');
+    const cdBrideEl = document.getElementById('cd-bride-name');
+    if (cdGroomEl && wedding.groom) cdGroomEl.textContent = wedding.groom.name;
+    if (cdBrideEl && wedding.bride) cdBrideEl.textContent = wedding.bride.name;
+
+    const cdDaysEl = document.getElementById('cd-days');
+    function tick() {
+      const diff = wDate.getTime() - Date.now();
+      if (cdDaysEl) cdDaysEl.textContent = diff <= 0 ? '0' : Math.floor(diff / 86400000);
+    }
+    tick();
+    setInterval(tick, 60000);
+
+    const v = wedding.venue;
+    if (v) {
+      const nameEl = document.getElementById('venue-name');
+      const hallEl = document.getElementById('venue-hall');
+      if (nameEl) nameEl.textContent = v.name || '';
+      if (hallEl) hallEl.textContent = v.hall || '';
+    }
+
+    [
+      document.getElementById('date-eyebrow'),
+      document.getElementById('date-full'),
+      document.getElementById('mini-cal'),
+      document.getElementById('countdown-wrap'),
+      document.getElementById('venue-wrap'),
+    ].filter(Boolean).forEach(el => observer.observe(el));
+  })();
+
+  /* ── 05. 갤러리 섹션 ── */
+  (function initGallery() {
+    const imgs    = Array.isArray(wedding.gallery) ? wedding.gallery : [];
+    const grid    = document.getElementById('gallery-grid');
+    const moreBtn = document.getElementById('gallery-more-btn');
+    const INIT    = 9;
+
+    if (!grid || imgs.length === 0) return;
+
+    imgs.forEach((src, idx) => {
+      const item = document.createElement('div');
+      item.className = 'g-item' + (idx >= INIT ? ' hidden-item' : '');
+      item.setAttribute('role', 'listitem');
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('aria-label', `사진 ${idx + 1}`);
+
+      const img = document.createElement('img');
+      img.src     = src;
+      img.alt     = `웨딩 사진 ${idx + 1}`;
+      img.loading = 'lazy';
+
+      item.appendChild(img);
+      item.addEventListener('click', () => openModal(idx));
+      item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(idx); });
+      grid.appendChild(item);
+    });
+
+    if (imgs.length > INIT) {
+      moreBtn.classList.remove('hidden');
+      moreBtn.addEventListener('click', () => {
+        grid.querySelectorAll('.hidden-item').forEach(el => el.classList.remove('hidden-item'));
+        moreBtn.classList.add('hidden');
+      });
+    }
+
+    const eyebrow = document.getElementById('gallery-eyebrow');
+    if (eyebrow) observer.observe(eyebrow);
+
+    const modal      = document.getElementById('gallery-modal');
+    const modalImg   = document.getElementById('modal-img');
+    const modalClose = document.getElementById('modal-close');
+    const modalPrev  = document.getElementById('modal-prev');
+    const modalNext  = document.getElementById('modal-next');
+    const modalCnt   = document.getElementById('modal-counter');
+    let   curIdx     = 0;
+
+    function updateCounter() {
+      if (modalCnt) modalCnt.textContent = `${curIdx + 1} / ${imgs.length}`;
+    }
+
+    function setModalImg(idx, direction) {
+      modalImg.classList.add('fading');
+      setTimeout(() => {
+        curIdx = (idx + imgs.length) % imgs.length;
+        modalImg.src = imgs[curIdx];
+        modalImg.alt = `웨딩 사진 ${curIdx + 1}`;
+        updateCounter();
+        modalImg.classList.remove('fading');
+      }, direction !== 0 ? 200 : 0);
+    }
+
+    function openModal(idx) {
+      curIdx = idx;
+      modal.classList.add('open');
+      modalImg.src = imgs[curIdx];
+      modalImg.alt = `웨딩 사진 ${curIdx + 1}`;
+      updateCounter();
+      document.body.style.overflow = 'hidden';
+      modalClose.focus();
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    modalPrev.addEventListener('click', () => setModalImg(curIdx - 1, -1));
+    modalNext.addEventListener('click', () => setModalImg(curIdx + 1,  1));
+
+    document.addEventListener('keydown', e => {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape')     closeModal();
+      if (e.key === 'ArrowLeft')  setModalImg(curIdx - 1, -1);
+      if (e.key === 'ArrowRight') setModalImg(curIdx + 1,  1);
+    });
+
+    let touchStartX = 0, touchStartY = 0;
+    modal.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    modal.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dy) > Math.abs(dx) || Math.abs(dx) < 40) return;
+      if (dx < 0) setModalImg(curIdx + 1,  1);
+      else         setModalImg(curIdx - 1, -1);
+    }, { passive: true });
+  })();
+
+})();
+</script>
+
+</body>
+</html>
