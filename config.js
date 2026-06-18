@@ -1,6 +1,6 @@
 const wedding = {
   // ① 메인 영상
-  video: { url: './video/SANY0283.MP4' },
+  video: { url: './video/SANY0283.mp4' },
 
   // ② 신랑·신부 정보
   groom: {
