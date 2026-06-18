@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <!-- OG 메타태그: JS로 동적 주입 -->
+  <!-- 카카오 SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" crossorigin="anonymous"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -552,6 +555,385 @@
       text-transform: uppercase;
       border-top: 1px solid var(--gray-5);
     }
+
+    /* ── 07. 계좌 안내 ── */
+    #account-section {
+      background: var(--bg);
+      padding: 72px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #account-section .acc-eyebrow {
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    #account-section .acc-eyebrow.visible { opacity: 1; transform: translateY(0); }
+
+    #account-section .acc-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 36px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.05s, transform 0.7s ease 0.05s;
+    }
+    #account-section .acc-title.visible { opacity: 1; transform: translateY(0); }
+
+    /* 토글 탭 버튼 */
+    #account-section .acc-tabs {
+      display: flex;
+      width: 100%;
+      max-width: 360px;
+      border: 1px solid var(--gray-5);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s;
+    }
+    #account-section .acc-tabs.visible { opacity: 1; transform: translateY(0); }
+
+    #account-section .acc-tab {
+      flex: 1;
+      padding: 12px;
+      background: var(--white);
+      border: none;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--gray-3);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    #account-section .acc-tab:first-child {
+      border-right: 1px solid var(--gray-5);
+    }
+    #account-section .acc-tab.active {
+      background: var(--black);
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    /* 계좌 목록 아코디언 */
+    #account-section .acc-list-wrap {
+      width: 100%;
+      max-width: 360px;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: max-height 0.4s ease, opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s;
+    }
+    #account-section .acc-list-wrap.open {
+      max-height: 600px;
+    }
+    #account-section .acc-list-wrap.visible { opacity: 1; transform: translateY(0); }
+
+    /* 계좌 카드 */
+    #account-section .acc-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--gray-5);
+    }
+    #account-section .acc-card:last-child { border-bottom: none; }
+
+    #account-section .acc-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    #account-section .acc-bank {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--gray-3);
+      letter-spacing: 0.04em;
+    }
+
+    #account-section .acc-holder {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    #account-section .acc-number {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--gray-2);
+      letter-spacing: 0.04em;
+    }
+
+    #account-section .acc-copy-btn {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border: 1px solid var(--gray-4);
+      background: var(--white);
+      border-radius: 999px;
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--gray-2);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    #account-section .acc-copy-btn:hover {
+      background: var(--black);
+      border-color: var(--black);
+      color: var(--white);
+    }
+    #account-section .acc-copy-btn:active { transform: scale(0.95); }
+
+    /* ── 06. 지도·길찾기 ── */
+    #location-section {
+      background: var(--white);
+      padding: 72px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    #location-section .loc-eyebrow {
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    #location-section .loc-eyebrow.visible { opacity: 1; transform: translateY(0); }
+
+    /* 주소 + 복사 */
+    #location-section .loc-address-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.05s, transform 0.7s ease 0.05s;
+    }
+    #location-section .loc-address-wrap.visible { opacity: 1; transform: translateY(0); }
+
+    #location-section .loc-address {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--gray-2);
+    }
+
+    #location-section .loc-copy-btn {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--gray-4);
+      background: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    #location-section .loc-copy-btn:hover {
+      background: var(--black);
+      border-color: var(--black);
+    }
+
+    /* 지도 이미지 */
+    #location-section .loc-map-link {
+      display: block;
+      width: 100%;
+      max-width: 360px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid var(--gray-5);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s;
+    }
+    #location-section .loc-map-link.visible { opacity: 1; transform: translateY(0); }
+
+    #location-section .loc-map-link img {
+      width: 100%;
+      display: block;
+    }
+
+    /* 길찾기 버튼 3개 */
+    #location-section .loc-nav-btns {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s;
+    }
+    #location-section .loc-nav-btns.visible { opacity: 1; transform: translateY(0); }
+
+    #location-section .loc-nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 8px;
+      border: 1px solid var(--gray-5);
+      background: var(--white);
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--gray-1);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      transition: background 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+    #location-section .loc-nav-btn:hover {
+      background: var(--bg);
+      border-color: var(--gray-4);
+    }
+    #location-section .loc-nav-btn .nav-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* 교통 안내 */
+    #location-section .loc-transport {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s;
+    }
+    #location-section .loc-transport.visible { opacity: 1; transform: translateY(0); }
+
+    #location-section .loc-transport-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    #location-section .loc-transport-icon {
+      flex-shrink: 0;
+      font-size: 14px;
+      margin-top: 1px;
+    }
+
+    #location-section .loc-transport-text {
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--gray-2);
+      line-height: 1.7;
+    }
+
+    /* 토스트 */
+    #toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--black);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 300;
+      padding: 10px 24px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 500;
+      white-space: nowrap;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    /* ── 08. 카카오 공유 푸터 ── */
+    #share-footer {
+      background: var(--white);
+      padding: 48px 32px 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      border-top: 1px solid var(--gray-5);
+    }
+
+    #share-footer .share-names {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--gray-3);
+      letter-spacing: 0.08em;
+    }
+
+    #share-footer .kakao-share-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: #FEE500;
+      border: none;
+      border-radius: 4px;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: #3C1E1E;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    #share-footer .kakao-share-btn:hover { opacity: 0.88; }
+    #share-footer .kakao-share-btn:active { transform: scale(0.97); }
+
+    /* ── 토스트 (업데이트) ── */
+    #toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(17,17,17,0.88);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 300;
+      padding: 11px 28px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 500;
+      white-space: nowrap;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -646,8 +1028,89 @@
   <p class="modal-counter" id="modal-counter"></p>
 </div>
 
-<!-- 이후 섹션들 (개발 예정) -->
-<section class="placeholder-section">06 · 지도 / 길찾기 — 준비 중</section>
+<!-- ===== 06. 지도·길찾기 섹션 ===== -->
+<section id="location-section" aria-label="오시는 길">
+
+  <p class="loc-eyebrow" id="loc-eyebrow">Location</p>
+
+  <!-- 주소 + 복사 버튼 -->
+  <div class="loc-address-wrap" id="loc-address-wrap">
+    <span class="loc-address" id="loc-address"></span>
+    <button class="loc-copy-btn" id="loc-copy-btn" aria-label="주소 복사">📋</button>
+  </div>
+
+  <!-- 지도 이미지 → 카카오맵 연결 -->
+  <a class="loc-map-link" id="loc-map-link" href="#" target="_blank" rel="noopener" aria-label="카카오맵에서 보기">
+    <img id="loc-map-img" src="" alt="지도" />
+  </a>
+
+  <!-- 길찾기 버튼 3개 -->
+  <div class="loc-nav-btns" id="loc-nav-btns">
+    <a class="loc-nav-btn" id="nav-naver" href="#" target="_blank" rel="noopener">
+      <span class="nav-icon">🗺️</span>
+      <span>네이버지도</span>
+    </a>
+    <a class="loc-nav-btn" id="nav-tmap" href="#">
+      <span class="nav-icon">🚗</span>
+      <span>티맵</span>
+    </a>
+    <a class="loc-nav-btn" id="nav-kakao" href="#" target="_blank" rel="noopener">
+      <span class="nav-icon">🟡</span>
+      <span>카카오맵</span>
+    </a>
+  </div>
+
+  <!-- 교통 안내 -->
+  <div class="loc-transport" id="loc-transport">
+    <div class="loc-transport-item">
+      <span class="loc-transport-icon">🚇</span>
+      <span class="loc-transport-text" id="transport-subway"></span>
+    </div>
+    <div class="loc-transport-item">
+      <span class="loc-transport-icon">🚌</span>
+      <span class="loc-transport-text" id="transport-bus"></span>
+    </div>
+    <div class="loc-transport-item">
+      <span class="loc-transport-icon">🅿️</span>
+      <span class="loc-transport-text" id="transport-parking"></span>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===== 07. 계좌 안내 섹션 ===== -->
+<section id="account-section" aria-label="계좌 안내">
+
+  <p class="acc-eyebrow" id="acc-eyebrow">Account</p>
+  <p class="acc-title" id="acc-title">마음 전하기</p>
+
+  <!-- 신랑측 / 신부측 탭 -->
+  <div class="acc-tabs" id="acc-tabs">
+    <button class="acc-tab active" id="tab-groom" aria-expanded="true">신랑측</button>
+    <button class="acc-tab"        id="tab-bride" aria-expanded="false">신부측</button>
+  </div>
+
+  <!-- 신랑측 계좌 목록 -->
+  <div class="acc-list-wrap open" id="acc-list-groom" aria-label="신랑측 계좌"></div>
+
+  <!-- 신부측 계좌 목록 -->
+  <div class="acc-list-wrap" id="acc-list-bride" aria-label="신부측 계좌"></div>
+
+</section>
+
+<!-- ===== 08. 카카오톡 공유 푸터 ===== -->
+<footer id="share-footer" aria-label="카카오톡 공유">
+  <p class="share-names" id="share-names"></p>
+  <button class="kakao-share-btn" id="kakao-share-btn" aria-label="카카오톡으로 공유하기">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M10 2C5.582 2 2 4.91 2 8.5c0 2.29 1.394 4.3 3.5 5.5L4.5 17l3.8-2.1c.55.1 1.12.1 1.7.1 4.418 0 8-2.91 8-6.5S14.418 2 10 2z" fill="currentColor"/>
+    </svg>
+    카카오톡으로 공유하기
+  </button>
+</footer>
+
+<!-- 토스트 메시지 -->
+<div id="toast">주소가 복사되었습니다</div>
 
 
 <!-- ===== config.js ===== -->
@@ -1051,6 +1514,213 @@ const wedding = {
     }, { passive: true });
   })();
 
+  /* ── 07. 계좌 안내 섹션 ── */
+  (function initAccount() {
+    const accounts = wedding.accounts;
+    if (!Array.isArray(accounts) || accounts.length === 0) return;
+
+    const listGroom = document.getElementById('acc-list-groom');
+    const listBride = document.getElementById('acc-list-bride');
+    const tabGroom  = document.getElementById('tab-groom');
+    const tabBride  = document.getElementById('tab-bride');
+
+    /* 계좌 카드 생성 */
+    function renderCards(container, side) {
+      const filtered = accounts.filter(a => a.side === side);
+      filtered.forEach(acc => {
+        const card = document.createElement('div');
+        card.className = 'acc-card';
+        card.innerHTML = `
+          <div class="acc-info">
+            <span class="acc-bank">${acc.bank}</span>
+            <span class="acc-holder">${acc.holder}</span>
+            <span class="acc-number">${acc.number}</span>
+          </div>
+          <button class="acc-copy-btn" aria-label="${acc.number} 복사">복사</button>
+        `;
+        /* 복사 버튼 */
+        card.querySelector('.acc-copy-btn').addEventListener('click', () => {
+          navigator.clipboard.writeText(acc.number).then(() => showToast('복사되었습니다 ✓'));
+        });
+        container.appendChild(card);
+      });
+    }
+
+    if (listGroom) renderCards(listGroom, 'groom');
+    if (listBride) renderCards(listBride, 'bride');
+
+    /* 탭 토글 */
+    function switchTab(show, hide, activeBtn, inactiveBtn) {
+      show.classList.add('open');
+      hide.classList.remove('open');
+      activeBtn.classList.add('active');
+      inactiveBtn.classList.remove('active');
+      activeBtn.setAttribute('aria-expanded', 'true');
+      inactiveBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    tabGroom.addEventListener('click', () => switchTab(listGroom, listBride, tabGroom, tabBride));
+    tabBride.addEventListener('click', () => switchTab(listBride, listGroom, tabBride, tabGroom));
+
+    /* IntersectionObserver 연결 */
+    [
+      document.getElementById('acc-eyebrow'),
+      document.getElementById('acc-title'),
+      document.getElementById('acc-tabs'),
+      listGroom,
+      listBride,
+    ].filter(Boolean).forEach(el => observer.observe(el));
+  })();
+
+  /* ── 06. 지도·길찾기 섹션 ── */
+  (function initLocation() {
+    const v = wedding.venue;
+    if (!v) return;
+
+    const encodedName = encodeURIComponent(v.name);
+    const { lat, lng, address, transport } = v;
+
+    /* 주소 텍스트 */
+    const addrEl = document.getElementById('loc-address');
+    if (addrEl) addrEl.textContent = address;
+
+    /* 주소 복사 버튼 */
+    const copyBtn = document.getElementById('loc-copy-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(address).then(() => showToast('주소가 복사되었습니다'));
+      });
+    }
+
+    /* 카카오맵 정적 지도 이미지 */
+    const mapLink = document.getElementById('loc-map-link');
+    const mapImg  = document.getElementById('loc-map-img');
+    if (mapLink && mapImg) {
+      mapLink.href = `https://map.kakao.com/link/map/${encodedName},${lat},${lng}`;
+      mapImg.src = `https://map.kakaocdn.net/api/staticmap?center=${lng},${lat}&level=3&size=360x200&markers=color:red|label:W|${lng},${lat}`;
+      mapImg.onerror = () => { mapImg.style.display = 'none'; };
+    }
+
+    /* 길찾기 버튼 링크 */
+    const naverBtn = document.getElementById('nav-naver');
+    if (naverBtn) {
+      naverBtn.href = `https://map.naver.com/p/directions/-/${lng},${lat},${encodedName}/-/transit`;
+    }
+
+    const tmapBtn = document.getElementById('nav-tmap');
+    if (tmapBtn) {
+      tmapBtn.addEventListener('click', e => {
+        e.preventDefault();
+        const appUrl = `tmap://route?goalx=${lng}&goaly=${lat}&goalname=${encodedName}`;
+        const webUrl = `https://tmap.life/route/to?goalx=${lng}&goaly=${lat}&goalname=${encodedName}`;
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = appUrl;
+        document.body.appendChild(iframe);
+        setTimeout(() => { document.body.removeChild(iframe); window.open(webUrl, '_blank'); }, 1500);
+      });
+    }
+
+    const kakaoBtn = document.getElementById('nav-kakao');
+    if (kakaoBtn) {
+      kakaoBtn.href = `https://map.kakao.com/link/to/${encodedName},${lat},${lng}`;
+    }
+
+    /* 교통 안내 텍스트 */
+    if (transport) {
+      const s = document.getElementById('transport-subway');
+      const b = document.getElementById('transport-bus');
+      const p = document.getElementById('transport-parking');
+      if (s) s.textContent = transport.subway  || '';
+      if (b) b.textContent = transport.bus     || '';
+      if (p) p.textContent = transport.parking || '';
+    }
+
+    /* IntersectionObserver 연결 */
+    [
+      document.getElementById('loc-eyebrow'),
+      document.getElementById('loc-address-wrap'),
+      document.getElementById('loc-map-link'),
+      document.getElementById('loc-nav-btns'),
+      document.getElementById('loc-transport'),
+    ].filter(Boolean).forEach(el => observer.observe(el));
+  })();
+
+  /* ── 토스트 ── */
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+})();
+
+/* ===== 08. OG 메타태그 동적 주입 + 카카오 공유 ===== */
+(function initKakaoShare() {
+  const og = wedding.og;
+  if (!og) return;
+
+  /* ── OG 메타태그 주입 ── */
+  const ogTags = [
+    { property: 'og:title',       content: og.title },
+    { property: 'og:description', content: og.description },
+    { property: 'og:image',       content: og.imageUrl },
+    { property: 'og:url',         content: og.pageUrl },
+    { property: 'og:type',        content: 'website' },
+  ];
+  ogTags.forEach(({ property, content }) => {
+    const meta = document.createElement('meta');
+    meta.setAttribute('property', property);
+    meta.setAttribute('content', content);
+    document.head.appendChild(meta);
+  });
+
+  /* ── 푸터 이름 바인딩 ── */
+  const shareNames = document.getElementById('share-names');
+  if (shareNames && wedding.groom && wedding.bride) {
+    shareNames.textContent = `${wedding.groom.name} · ${wedding.bride.name}`;
+  }
+
+  /* ── 카카오 SDK 초기화 ── */
+  if (typeof Kakao !== 'undefined' && og.kakaoAppKey && og.kakaoAppKey !== 'YOUR_KAKAO_JAVASCRIPT_KEY') {
+    if (!Kakao.isInitialized()) Kakao.init(og.kakaoAppKey);
+  }
+
+  /* ── 공유 버튼 ── */
+  const shareBtn = document.getElementById('kakao-share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
+        /* 앱키 미설정 or SDK 미초기화 시 URL 복사로 대체 */
+        navigator.clipboard.writeText(og.pageUrl || location.href)
+          .then(() => showToast('링크가 복사되었습니다'));
+        return;
+      }
+      Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: og.title,
+          description: og.description,
+          imageUrl: og.imageUrl,
+          link: {
+            mobileWebUrl: og.pageUrl,
+            webUrl: og.pageUrl,
+          },
+        },
+        buttons: [
+          {
+            title: '청첩장 보기',
+            link: {
+              mobileWebUrl: og.pageUrl,
+              webUrl: og.pageUrl,
+            },
+          },
+        ],
+      });
+    });
+  }
 })();
 </script>
 
