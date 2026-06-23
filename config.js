@@ -90,4 +90,10 @@ const wedding = {
   pageUrl: 'https://rbdms213.github.io/cy-yk-20261121-wedding-private/',
   kakaoAppKey: '0ba03cc8903c5643a252fc137701ef85',
   },
+  
+  // ⑨ Supabase
+  supabase: {
+    url: 'https://saxslvwgjznbqwmgcwdq.supabase.co',
+    anonKey: 'sb_publishable_z96MsIOQUSwArJ0TDoWQ2A_ftfgekHP',
+  },
 };
