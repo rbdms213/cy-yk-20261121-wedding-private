@@ -940,6 +940,102 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+    
+    /* ── 09. 방명록 ── */
+    #guestbook-section {
+      background: var(--bg);
+      padding: 72px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #guestbook-section .gb-eyebrow {
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      margin-bottom: 12px;
+    }
+
+    #guestbook-section .gb-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 36px;
+    }
+
+    #guestbook-section .gb-form {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+
+    #guestbook-section .gb-form input,
+    #guestbook-section .gb-form textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--gray-5);
+      background: var(--white);
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--black);
+      outline: none;
+      border-radius: 0;
+      -webkit-appearance: none;
+      transition: border-color 0.2s;
+    }
+    #guestbook-section .gb-form input:focus,
+    #guestbook-section .gb-form textarea:focus { border-color: var(--gray-3); }
+    #guestbook-section .gb-form input::placeholder,
+    #guestbook-section .gb-form textarea::placeholder { color: var(--gray-4); }
+    #guestbook-section .gb-form textarea {
+      height: 100px;
+      resize: none;
+      line-height: 1.7;
+    }
+    #guestbook-section .gb-form-row { display: flex; gap: 8px; }
+    #guestbook-section .gb-form-row input { flex: 1; }
+
+    #guestbook-section .gb-submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    #guestbook-section .gb-submit-btn:hover { opacity: 0.75; }
+    #guestbook-section .gb-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #guestbook-section .gb-list {
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #guestbook-section .gb-item {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--gray-5);
+    }
+    #guestbook-section .gb-item:first-child { border-top: 1px solid var(--gray-5); }
+
+    #guestbook-section .gb-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom:
   </style>
 </head>
 <body>
@@ -1103,7 +1199,39 @@
   <div class="acc-list-wrap" id="acc-list-bride" aria-label="신부측 계좌"></div>
 
 </section>
+  
+<!-- ===== 09. 방명록 섹션 ===== -->
+<section id="guestbook-section" aria-label="방명록">
+  <p class="gb-eyebrow">Guestbook</p>
+  <p class="gb-title">축하 메시지</p>
 
+  <div class="gb-form" id="gb-form">
+    <div class="gb-form-row">
+      <input type="text"     id="gb-author"   placeholder="이름" maxlength="20" />
+      <input type="password" id="gb-password" placeholder="비밀번호 (삭제 시 필요)" maxlength="20" />
+    </div>
+    <textarea id="gb-message" placeholder="축하 메시지를 남겨주세요 ✉️" maxlength="300"></textarea>
+    <button class="gb-submit-btn" id="gb-submit-btn">메시지 남기기</button>
+  </div>
+
+  <div class="gb-list" id="gb-list">
+    <p class="gb-empty">아직 작성된 메시지가 없습니다.</p>
+  </div>
+</section>
+
+<!-- 삭제 확인 모달 -->
+<div id="gb-delete-modal" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <p class="modal-title">메시지 삭제</p>
+    <p class="modal-desc">작성 시 입력한 비밀번호를 입력해주세요.</p>
+    <input type="password" id="gb-delete-pw" placeholder="비밀번호" maxlength="20" />
+    <div class="modal-btns">
+      <button class="modal-cancel"  id="gb-delete-cancel">취소</button>
+      <button class="modal-confirm" id="gb-delete-confirm">삭제</button>
+    </div>
+  </div>
+</div>
+  
 <!-- ===== 08. 카카오톡 공유 푸터 ===== -->
 <footer id="share-footer" aria-label="카카오톡 공유">
   <p class="share-names" id="share-names"></p>
@@ -1665,7 +1793,156 @@ const wedding = {
   }
 
 })();
+/* ===== 09. 방명록 ===== */
+(function initGuestbook() {
+  const sb = wedding.supabase;
+  if (!sb || !sb.url || !sb.anonKey) return;
 
+  const HEADERS = {
+    'Content-Type': 'application/json',
+    'apikey': sb.anonKey,
+    'Authorization': `Bearer ${sb.anonKey}`,
+    'Prefer': 'return=representation',
+  };
+  const API = `${sb.url}/rest/v1/guestbook`;
+
+  const listEl    = document.getElementById('gb-list');
+  const submitBtn = document.getElementById('gb-submit-btn');
+  const modal     = document.getElementById('gb-delete-modal');
+  const deletePwEl= document.getElementById('gb-delete-pw');
+  let   deleteTargetId = null;
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  async function loadMessages() {
+    try {
+      const res = await fetch(
+        `${API}?is_deleted=eq.false&order=created_at.desc&select=id,author_name,message,created_at`,
+        { headers: HEADERS }
+      );
+      const data = await res.json();
+      listEl.innerHTML = '';
+
+      if (!data.length) {
+        listEl.innerHTML = '<p class="gb-empty">아직 작성된 메시지가 없습니다.</p>';
+        return;
+      }
+
+      data.forEach(row => {
+        const item = document.createElement('div');
+        item.className = 'gb-item';
+        item.innerHTML = `
+          <div class="gb-item-header">
+            <span class="gb-author">${row.author_name}</span>
+            <span class="gb-date">${formatDate(row.created_at)}</span>
+          </div>
+          <p class="gb-message">${row.message.replace(/\n/g, '<br>')}</p>
+          <button class="gb-delete-btn" data-id="${row.id}">삭제</button>
+        `;
+        item.querySelector('.gb-delete-btn').addEventListener('click', () => {
+          deleteTargetId = row.id;
+          deletePwEl.value = '';
+          modal.classList.add('open');
+          deletePwEl.focus();
+        });
+        listEl.appendChild(item);
+      });
+    } catch (e) {
+      console.error('방명록 로드 실패:', e);
+    }
+  }
+
+  submitBtn.addEventListener('click', async () => {
+    const author   = document.getElementById('gb-author').value.trim();
+    const password = document.getElementById('gb-password').value.trim();
+    const message  = document.getElementById('gb-message').value.trim();
+
+    if (!author)   { showToast('이름을 입력해주세요'); return; }
+    if (!password) { showToast('비밀번호를 입력해주세요'); return; }
+    if (!message)  { showToast('메시지를 입력해주세요'); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '저장 중...';
+
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: HEADERS,
+        body: JSON.stringify({
+          author_name:   author,
+          message:       message,
+          password_hash: password,
+        }),
+      });
+
+      if (res.ok) {
+        document.getElementById('gb-author').value   = '';
+        document.getElementById('gb-password').value = '';
+        document.getElementById('gb-message').value  = '';
+        showToast('메시지가 등록되었습니다 ✓');
+        await loadMessages();
+      } else {
+        showToast('저장에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      showToast('오류가 발생했습니다.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '메시지 남기기';
+    }
+  });
+
+  document.getElementById('gb-delete-cancel').addEventListener('click', () => {
+    modal.classList.remove('open');
+    deleteTargetId = null;
+  });
+
+  modal.addEventListener('click', e => {
+    if (e.target === modal) { modal.classList.remove('open'); deleteTargetId = null; }
+  });
+
+  document.getElementById('gb-delete-confirm').addEventListener('click', async () => {
+    const pw = deletePwEl.value.trim();
+    if (!pw) { showToast('비밀번호를 입력해주세요'); return; }
+    if (!deleteTargetId) return;
+
+    try {
+      const checkRes = await fetch(
+        `${API}?id=eq.${deleteTargetId}&password_hash=eq.${encodeURIComponent(pw)}&is_deleted=eq.false&select=id`,
+        { headers: HEADERS }
+      );
+      const matched = await checkRes.json();
+
+      if (!matched.length) { showToast('비밀번호가 틀렸습니다.'); return; }
+
+      const delRes = await fetch(`${API}?id=eq.${deleteTargetId}`, {
+        method: 'PATCH',
+        headers: HEADERS,
+        body: JSON.stringify({ is_deleted: true, deleted_at: new Date().toISOString() }),
+      });
+
+      if (delRes.ok) {
+        modal.classList.remove('open');
+        deleteTargetId = null;
+        showToast('삭제되었습니다.');
+        await loadMessages();
+      } else {
+        showToast('삭제에 실패했습니다.');
+      }
+    } catch (e) {
+      showToast('오류가 발생했습니다.');
+    }
+  });
+
+  deletePwEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('gb-delete-confirm').click();
+  });
+
+  loadMessages();
+})();
 /* ===== 08. OG 메타태그 동적 주입 + 카카오 공유 ===== */
 (function initKakaoShare() {
   const og = wedding.og;
